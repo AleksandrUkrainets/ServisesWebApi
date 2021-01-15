@@ -10,13 +10,17 @@
     <h2>Список заметок</h2>
     <form name="noteForm">
         <input type="hidden" name="id" value="0" />
+        <!--<div class="form-group col-md-5">
+            <label for="id">Id:</label>
+            <input class="form-control" name="id" />
+        </div>-->
         <div class="form-group col-md-5">
-            <label for="name">Заголовок:</label>
+            <label for="title">Заголовок:</label>
             <input class="form-control" name="title" />
         </div>
         <div class="form-group col-md-5">
-            <label for="age">Заметка:</label>
-            <input class="form-control" name="descriprion" type="number" />
+            <label for="description">Заметка:</label>
+            <input class="form-control" name="description" />
         </div>
         <div class="panel-body">
             <button type="submit" id="submit" class="btn btn-primary">Сохранить</button>
@@ -24,16 +28,16 @@
         </div>
     </form>
     <table class="table table-condensed table-striped  col-md-6">
-        <thead><tr><th>Id</th><th>UserId</th><th>Заметки</th><th></th></tr></thead>
+        <thead><tr><th>UserId</th><th>Заголовок</th><th>Заметки</th><th></th></tr></thead>
         <tbody>
         </tbody>
     </table>
-    <div>Ukrainets Aleksandr - 2021</div>
+    
     <script>
         // Получение всех пользователей
         async function GetNotes() {
             // отправляет запрос и получаем ответ
-            const response = await fetch("/api/notes", {
+            const response = await fetch("http://localhost:62114/api/notes/", {
                 method: "GET",
                 headers: { "Accept": "application/json" }
             });
@@ -50,7 +54,7 @@
         }
         // Получение одного пользователя
         async function GetNote(id) {
-            const response = await fetch("/api/notes/" + id, {
+            const response = await fetch("http://localhost:62114/api/notes/" + id, {
                 method: "GET",
                 headers: { "Accept": "application/json" }
             });
@@ -63,42 +67,43 @@
             }
         }
         // Добавление пользователя
-        async function CreateNote(noteTitle, noteDescription) {
-
-            const response = await fetch("api/notes", {
+        async function CreateNote(noteTitle, noteDescription, userId) {
+            const response = await fetch("http://localhost:62114/api/notes/", {
                 method: "POST",
                 headers: { "Accept": "application/json", "Content-Type": "application/json" },
                 body: JSON.stringify({
                     title: noteTitle,
-                    description: noteDescription
+                    description: noteDescription,
+                    userid: userId
                 })
             });
             if (response.ok === true) {
-                const user = await response.json();
+                const note = await response.json();
                 reset();
                 document.querySelector("tbody").append(row(note));
             }
         }
         // Изменение пользователя
-        async function EditNote(noteId, noteTitle, noteDescription) {
-            const response = await fetch("api/notes", {
+        async function EditNote(noteId, noteTitle, noteDescription, userId) {
+            const response = await fetch("http://localhost:62114/api/notes/", {
                 method: "PUT",
                 headers: { "Accept": "application/json", "Content-Type": "application/json" },
                 body: JSON.stringify({
                     id: parseInt(noteId, 10),
                     title: noteTitle,
-                    description: noteDescription
+                    description: noteDescription,
+                    userid: userId
                 })
             });
             if (response.ok === true) {
-                const user = await response.json();
+                const note = await response.json();
                 reset();
                 document.querySelector("tr[data-rowid='" + note.id + "']").replaceWith(row(note));
             }
         }
         // Удаление пользователя
         async function DeleteNote(id) {
-            const response = await fetch("/api/notes/" + id, {
+            const response = await fetch("http://localhost:62114/api/notes/" + id, {
                 method: "DELETE",
                 headers: { "Accept": "application/json" }
             });
@@ -118,11 +123,11 @@
         function row(note) {
 
             const tr = document.createElement("tr");
-            tr.setAttribute("data-rowid", note.id);
+            tr.setAttribute("data-rowid", note.userId);
 
-            const idTd = document.createElement("td");
-            idTd.append(note.id);
-            tr.append(idTd);
+            const userIdTd = document.createElement("td");
+            userIdTd.append(note.userId);
+            tr.append(userIdTd);
 
             const titleTd = document.createElement("td");
             titleTd.append(note.title);
@@ -135,7 +140,7 @@
             const linksTd = document.createElement("td");
 
             const editLink = document.createElement("a");
-            editLink.setAttribute("data-id", user.id);
+            editLink.setAttribute("data-id", note.id);
             editLink.setAttribute("style", "cursor:pointer;padding:15px;");
             editLink.append("Изменить");
             editLink.addEventListener("click", e => {
@@ -174,10 +179,11 @@
             const id = form.elements["id"].value;
             const title = form.elements["title"].value;
             const description = form.elements["description"].value;
+            const userid = 1;
             if (id == 0)
-                CreateNote(title, description);
+                CreateNote(title, description, userid);
             else
-                EditNote(id, title, description);
+                EditNote(id, title, description, userid);
         });
 
         // загрузка пользователей

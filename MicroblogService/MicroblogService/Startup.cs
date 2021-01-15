@@ -25,8 +25,9 @@ namespace MicroblogService
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
             services.AddDbContext<NotesContext>(x => x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
+            
             services.AddControllers();
         }
 
@@ -37,8 +38,14 @@ namespace MicroblogService
            /// {
                 app.UseDeveloperExceptionPage();
             //}
-
+            
             app.UseRouting();
+            app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            ////**
+
+            //app.UseDefaultFiles();
+            //app.UseStaticFiles();
+            ////**
 
             app.UseEndpoints(endpoints =>
             {
@@ -49,5 +56,7 @@ namespace MicroblogService
                 endpoints.MapControllers();
             });
         }
+
+
     }
 }

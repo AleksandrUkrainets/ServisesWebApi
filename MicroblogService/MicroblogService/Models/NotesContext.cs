@@ -21,8 +21,8 @@ namespace MicroblogService.Models
             base.OnModelCreating(builder);
             builder.Entity<Note>().
                 HasData(
-                new Note {Id = 1, DateTime = dateCreatingDB, Title = "First test note", Description = "It is first test note in DB", UserId = 1 },
-                new Note {Id = 2, DateTime = dateCreatingDB, Title = "Second test note", Description = "It is second test note in DB", UserId = 1 }
+                new Note {Id = 1,  Title = "First test note", Description = "It is first test note in DB", UserId = 1 },
+                new Note {Id = 2,  Title = "Second test note", Description = "It is second test note in DB", UserId = 1 }
                 );
         }
     }

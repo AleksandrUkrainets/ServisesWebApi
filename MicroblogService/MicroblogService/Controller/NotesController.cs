@@ -1,4 +1,5 @@
 ﻿using MicroblogService.Models;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,6 +12,7 @@ namespace MicroblogService.Controller
 
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors]
     public class NotesController : ControllerBase
     {
         readonly NotesContext _db;
@@ -54,7 +56,7 @@ namespace MicroblogService.Controller
         }
 
         // PUT api/<ValuesController>/5
-        [HttpPut("{id}")]
+        [HttpPut]
         public async Task<ActionResult<Note>> Put(Note note)
         {
             if (note == null)
