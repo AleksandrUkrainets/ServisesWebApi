@@ -15,7 +15,6 @@ namespace MicroblogService.Models
             Database.EnsureCreated();
         }
 
-        private readonly DateTime dateCreatingDB = new DateTime();
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
