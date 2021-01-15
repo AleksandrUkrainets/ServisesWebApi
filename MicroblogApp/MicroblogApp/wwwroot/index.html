@@ -1,0 +1,188 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Тестовый микроблог</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <h2>Список заметок</h2>
+    <form name="noteForm">
+        <input type="hidden" name="id" value="0" />
+        <div class="form-group col-md-5">
+            <label for="name">Заголовок:</label>
+            <input class="form-control" name="title" />
+        </div>
+        <div class="form-group col-md-5">
+            <label for="age">Заметка:</label>
+            <input class="form-control" name="descriprion" type="number" />
+        </div>
+        <div class="panel-body">
+            <button type="submit" id="submit" class="btn btn-primary">Сохранить</button>
+            <a id="reset" class="btn btn-primary">Сбросить</a>
+        </div>
+    </form>
+    <table class="table table-condensed table-striped  col-md-6">
+        <thead><tr><th>Id</th><th>UserId</th><th>Заметки</th><th></th></tr></thead>
+        <tbody>
+        </tbody>
+    </table>
+    <div>Ukrainets Aleksandr - 2021</div>
+    <script>
+        // Получение всех пользователей
+        async function GetNotes() {
+            // отправляет запрос и получаем ответ
+            const response = await fetch("/api/notes", {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            // если запрос прошел нормально
+            if (response.ok === true) {
+                // получаем данные
+                const notes = await response.json();
+                let rows = document.querySelector("tbody");
+                notes.forEach(note => {
+                    // добавляем полученные элементы в таблицу
+                    rows.append(row(note));
+                });
+            }
+        }
+        // Получение одного пользователя
+        async function GetNote(id) {
+            const response = await fetch("/api/notes/" + id, {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                const note = await response.json();
+                const form = document.forms["noteForm"];
+                form.elements["id"].value = note.id;
+                form.elements["title"].value = note.title;
+                form.elements["description"].value = note.description;
+            }
+        }
+        // Добавление пользователя
+        async function CreateNote(noteTitle, noteDescription) {
+
+            const response = await fetch("api/notes", {
+                method: "POST",
+                headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    title: noteTitle,
+                    description: noteDescription
+                })
+            });
+            if (response.ok === true) {
+                const user = await response.json();
+                reset();
+                document.querySelector("tbody").append(row(note));
+            }
+        }
+        // Изменение пользователя
+        async function EditNote(noteId, noteTitle, noteDescription) {
+            const response = await fetch("api/notes", {
+                method: "PUT",
+                headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    id: parseInt(noteId, 10),
+                    title: noteTitle,
+                    description: noteDescription
+                })
+            });
+            if (response.ok === true) {
+                const user = await response.json();
+                reset();
+                document.querySelector("tr[data-rowid='" + note.id + "']").replaceWith(row(note));
+            }
+        }
+        // Удаление пользователя
+        async function DeleteNote(id) {
+            const response = await fetch("/api/notes/" + id, {
+                method: "DELETE",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                const note = await response.json();
+                document.querySelector("tr[data-rowid='" + note.id + "']").remove();
+            }
+        }
+
+        // сброс формы
+        function reset() {
+            const form = document.forms["noteForm"];
+            form.reset();
+            form.elements["id"].value = 0;
+        }
+        // создание строки для таблицы
+        function row(note) {
+
+            const tr = document.createElement("tr");
+            tr.setAttribute("data-rowid", note.id);
+
+            const idTd = document.createElement("td");
+            idTd.append(note.id);
+            tr.append(idTd);
+
+            const titleTd = document.createElement("td");
+            titleTd.append(note.title);
+            tr.append(titleTd);
+
+            const descriptionTd = document.createElement("td");
+            descriptionTd.append(note.description);
+            tr.append(descriptionTd);
+
+            const linksTd = document.createElement("td");
+
+            const editLink = document.createElement("a");
+            editLink.setAttribute("data-id", user.id);
+            editLink.setAttribute("style", "cursor:pointer;padding:15px;");
+            editLink.append("Изменить");
+            editLink.addEventListener("click", e => {
+
+                e.preventDefault();
+                GetNote(note.id);
+            });
+            linksTd.append(editLink);
+
+            const removeLink = document.createElement("a");
+            removeLink.setAttribute("data-id", note.id);
+            removeLink.setAttribute("style", "cursor:pointer;padding:15px;");
+            removeLink.append("Удалить");
+            removeLink.addEventListener("click", e => {
+
+                e.preventDefault();
+                DeleteNote(note.id);
+            });
+
+            linksTd.append(removeLink);
+            tr.appendChild(linksTd);
+
+            return tr;
+        }
+        // сброс значений формы
+        document.getElementById("reset").click(function (e) {
+
+            e.preventDefault();
+            reset();
+        })
+
+        // отправка формы
+        document.forms["noteForm"].addEventListener("submit", e => {
+            e.preventDefault();
+            const form = document.forms["noteForm"];
+            const id = form.elements["id"].value;
+            const title = form.elements["title"].value;
+            const description = form.elements["description"].value;
+            if (id == 0)
+                CreateNote(title, description);
+            else
+                EditNote(id, title, description);
+        });
+
+        // загрузка пользователей
+        GetNotes();
+
+    </script>
+</body>
+</html>

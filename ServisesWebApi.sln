@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicroblogService", "MicroblogService\MicroblogService\MicroblogService.csproj", "{3959AA87-C56A-43AD-9678-87093F63CB47}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MicroblogService", "MicroblogService\MicroblogService\MicroblogService.csproj", "{3959AA87-C56A-43AD-9678-87093F63CB47}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicroblogApp", "MicroblogApp\MicroblogApp\MicroblogApp.csproj", "{7D8D3835-110B-4C03-A033-1B72CDA2EB27}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{3959AA87-C56A-43AD-9678-87093F63CB47}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3959AA87-C56A-43AD-9678-87093F63CB47}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3959AA87-C56A-43AD-9678-87093F63CB47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D8D3835-110B-4C03-A033-1B72CDA2EB27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D8D3835-110B-4C03-A033-1B72CDA2EB27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D8D3835-110B-4C03-A033-1B72CDA2EB27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D8D3835-110B-4C03-A033-1B72CDA2EB27}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
