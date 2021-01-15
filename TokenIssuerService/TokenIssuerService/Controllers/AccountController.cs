@@ -14,7 +14,7 @@ namespace TokenIssuerService.Controllers
 {
     //[Route("/token/[controller]")]
     //[ApiController]
-    //[EnableCors]
+    [EnableCors]
     public class AccountController : Controller
     {
         readonly PersonsContext _personContext;

@@ -10,7 +10,7 @@ namespace TokenIssuerService.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    //[EnableCors]
+    [EnableCors]
     public class ValuesController : Controller
     {
         [Authorize]
