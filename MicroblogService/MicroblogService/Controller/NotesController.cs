@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,14 +21,12 @@ namespace MicroblogService.Controller
             _db = db;
         }
 
-        // GET: api/<ValuesController>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Note>>> Get()
         {
             return await _db.Notes.ToListAsync();
         }
 
-        // GET api/<ValuesController>/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Note>> Get(int id)
         {
@@ -41,7 +38,6 @@ namespace MicroblogService.Controller
             return new ObjectResult(note);
         }
 
-        // POST api/<ValuesController>
         [HttpPost]
         public async Task<ActionResult<Note>> Post(Note note)
         {
@@ -55,7 +51,6 @@ namespace MicroblogService.Controller
             return Ok(note);
         }
 
-        // PUT api/<ValuesController>/5
         [HttpPut]
         public async Task<ActionResult<Note>> Put(Note note)
         {
@@ -73,7 +68,6 @@ namespace MicroblogService.Controller
             return Ok(note);
         }
 
-        // DELETE api/<ValuesController>/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<Note>> Delete(int id)
         {

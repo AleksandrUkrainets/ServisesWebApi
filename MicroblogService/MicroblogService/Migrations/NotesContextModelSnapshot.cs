@@ -31,8 +31,8 @@ namespace MicroblogService.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -44,14 +44,14 @@ namespace MicroblogService.Migrations
                             Id = 1,
                             Description = "It is first test note in DB",
                             Title = "First test note",
-                            UserId = 1
+                            UserName = "qwerty@gmail.com"
                         },
                         new
                         {
                             Id = 2,
                             Description = "It is second test note in DB",
                             Title = "Second test note",
-                            UserId = 1
+                            UserName = "qwerty@gmail.com"
                         });
                 });
 #pragma warning restore 612, 618

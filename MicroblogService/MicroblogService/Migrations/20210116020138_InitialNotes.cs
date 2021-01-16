@@ -2,7 +2,7 @@
 
 namespace MicroblogService.Migrations
 {
-    public partial class InitialBlogDB : Migration
+    public partial class InitialNotes : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -14,7 +14,7 @@ namespace MicroblogService.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -23,13 +23,13 @@ namespace MicroblogService.Migrations
 
             migrationBuilder.InsertData(
                 table: "Notes",
-                columns: new[] { "Id", "Description", "Title", "UserId" },
-                values: new object[] { 1, "It is first test note in DB", "First test note", 1 });
+                columns: new[] { "Id", "Description", "Title", "UserName" },
+                values: new object[] { 1, "It is first test note in DB", "First test note", "qwerty@gmail.com" });
 
             migrationBuilder.InsertData(
                 table: "Notes",
-                columns: new[] { "Id", "Description", "Title", "UserId" },
-                values: new object[] { 2, "It is second test note in DB", "Second test note", 1 });
+                columns: new[] { "Id", "Description", "Title", "UserName" },
+                values: new object[] { 2, "It is second test note in DB", "Second test note", "qwerty@gmail.com" });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

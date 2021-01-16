@@ -9,110 +9,84 @@
         * {
             box-sizing: border-box;
         }
-
-        /* Create two unequal columns that floats next to each other */
         .column {
             float: left;
             padding: 10px;
-            height: 600px; /* Should be removed. Only for demonstration */
+            height: 600px;
         }
-
         .left {
             width: 75%;
         }
-
         .right {
             width: 25%;
         }
-
-        /* Clear floats after the columns */
         .row:after {
             content: "";
             display: table;
             clear: both;
         }
-
         #title {
-            width: 300px; /* Ширина поля в пикселах */
+            width: 300px;
         }
     </style>
 </head>
 <body>
-    <!--<h2>Two Unequal Columns</h2>-->
     <div class="row">
         <div class="column left" style="background-color:#aaa;">
-            <!--<h2>Column 1</h2>-->
-            <h3>Список заметок</h3>
+            <h3>Лента новостей</h3>
             <div>
-                <!--<h2>Список заметок</h2>-->
                 <form name="noteForm">
                     <input type="hidden" name="id" value="0" />
                     <div class="form-group col-md-5">
                         <label for="title">Заголовок:</label><br />
-                        <input class="form-control" name="title" size="160"/>
+                        <input class="form-control" name="title" size="100"/>
                     </div>
                     <div class="form-group col-md-5">
                         <label for="description">Заметка:</label><br />
-                        <input class="form-control" name="description" size="160"/>
+                        <input class="form-control" name="description" size="100"/>
                     </div>
                     <div class="panel-body">
-                        <button type="submit" id="submit" class="btn btn-primary">Сохранить</button>
-                        <!--<a id="reset" class="btn btn-primary">Сбросить</a>-->
-                        <input type="submit" id="reset" value="Сбросить" />
+                        <button type="submit" id="submit"  disabled class="btn btn-primary">Сохранить</button>
+                        <a id="reset" visibility: hidden class="btn btn-primary">Сбросить</a>
                     </div>
                 </form>
                 <table class="table table-condensed table-striped  col-md-6">
-                    <thead><tr><th>Id</th><th>UserId</th><th>Заголовок</th><th>Заметки</th><th></th></tr></thead>
+                    <thead><tr><th>UserName</th><th>Заголовок</th><th>Заметки</th><th></th></tr></thead>
                     <tbody>
                     </tbody>
                 </table>
             </div>
         </div>
         <div class="column right" style="background-color:#bbb;">
-            <!--<h2>Column 2</h2>-->
-            <!--<form name="userForm">-->
-                <div id="userInfo" style="display:none;">
-                    <p>Вы вошли как: <span id="userName"></span></p>
-                    <input type="button" value="Выйти" id="logOut" />
-                </div>
-                <div id="loginForm">
-                    <h3>Вход на сайт</h3>
-                    <label>Введите email</label><br />
-                    <input type="email" id="emailLogin" /> <br />
-                    <label>Введите пароль</label><br />
-                    <input type="password" id="passwordLogin" /><br />
-                    <input type="submit" id="submitLogin" value="Логин" />
-                </div>
-                <div>
-                    <input type="submit" id="getDataByLogin" value="Данные по логину" />
-                </div>
-                <div>
-                    <input type="submit" id="getDataByRole" value="Данные по роли" />
-                </div>
-            <!--</form>-->
+            <div id="userInfo" style="display:none;">
+                <p>Вы вошли как: <span id="userName"></span></p>
+                <input type="button" value="Выйти" id="logOut" />
+            </div>
+            <div id="loginForm">
+                <h3>Вход на сайт</h3>
+                <label>Введите email</label><br />
+                <input type="email" id="emailLogin" /> <br />
+                <label>Введите пароль</label><br />
+                <input type="password" id="passwordLogin" /><br />
+                <input type="submit" id="submitLogin" value="Логин" />
+            </div>
         </div>
     </div>
 
     <script>
-        // Получение всех заметок
         async function GetNotes() {
-            // отправляет запрос и получаем ответ
             const response = await fetch("http://localhost:62114/api/notes/", {
                 method: "GET",
                 headers: { "Accept": "application/json" }
             });
-            // если запрос прошел нормально
             if (response.ok === true) {
-                // получаем данные
                 const notes = await response.json();
                 let rows = document.querySelector("tbody");
                 notes.forEach(note => {
-                    // добавляем полученные элементы в таблицу
                     rows.append(row(note));
                 });
             }
         }
-        // Получение одной заметки
         async function GetNote(id) {
             const response = await fetch("http://localhost:62114/api/notes/" + id, {
                 method: "GET",
@@ -126,15 +100,14 @@
                 form.elements["description"].value = note.description;
             }
         }
-        // Добавление заметки
-        async function CreateNote(noteTitle, noteDescription, userId) {
+        async function CreateNote(noteTitle, noteDescription, userName) {
             const response = await fetch("http://localhost:62114/api/notes/", {
                 method: "POST",
                 headers: { "Accept": "application/json", "Content-Type": "application/json" },
                 body: JSON.stringify({
                     title: noteTitle,
                     description: noteDescription,
-                    userid: userId
+                    username: userName
                 })
             });
             if (response.ok === true) {
@@ -142,56 +115,21 @@
                 reset();
                 document.querySelector("tbody").append(row(note));
             }
+            reset();
         }
-        // Изменение заметки
-        async function EditNote(noteId, noteTitle, noteDescription, userId) {
-            const response = await fetch("http://localhost:62114/api/notes/", {
-                method: "PUT",
-                headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    id: parseInt(noteId, 10),
-                    title: noteTitle,
-                    description: noteDescription,
-                    userid: userId
-                })
-            });
-            if (response.ok === true) {
-                const note = await response.json();
-                reset();
-                document.querySelector("tr[data-rowid='" + note.id + "']").replaceWith(row(note));
-            }
-        }
-        // Удаление заметки
-        async function DeleteNote(id) {
-            const response = await fetch("http://localhost:62114/api/notes/" + id, {
-                method: "DELETE",
-                headers: { "Accept": "application/json" }
-            });
-            if (response.ok === true) {
-                const note = await response.json();
-                document.querySelector("tr[data-rowid='" + note.id + "']").remove();
-            }
-        }
-
-        // сброс формы
         function reset() {
             const form = document.forms["noteForm"];
             form.reset();
             form.elements["id"].value = 0;
         }
-        // создание строки для таблицы
         function row(note) {
 
             const tr = document.createElement("tr");
             tr.setAttribute("data-rowid", note.id);
 
-            const idTd = document.createElement("td");
-            idTd.append(note.id);
-            tr.append(idTd);
-
-            const userIdTd = document.createElement("td");
-            userIdTd.append(note.userId);
-            tr.append(userIdTd);
+            const userNameTd = document.createElement("td");
+            userNameTd.append(note.userName);
+            tr.append(userNameTd);
 
             const titleTd = document.createElement("td");
             titleTd.append(note.title);
@@ -201,100 +139,54 @@
             descriptionTd.append(note.description);
             tr.append(descriptionTd);
 
-            const linksTd = document.createElement("td");
-
-            const editLink = document.createElement("a");
-            editLink.setAttribute("data-id", note.id);
-            editLink.setAttribute("style", "cursor:pointer;padding:15px;");
-            editLink.append("Изменить");
-            editLink.addEventListener("click", e => {
-
-                e.preventDefault();
-                GetNote(note.id);
-            });
-            linksTd.append(editLink);
-
-            const removeLink = document.createElement("a");
-            removeLink.setAttribute("data-id", note.id);
-            removeLink.setAttribute("style", "cursor:pointer;padding:15px;");
-            removeLink.append("Удалить");
-            removeLink.addEventListener("click", e => {
-
-                e.preventDefault();
-                DeleteNote(note.id);
-            });
-
-            linksTd.append(removeLink);
-            tr.appendChild(linksTd);
-
             return tr;
         }
-        // сброс значений формы
         document.getElementById("reset").click(function (e) {
 
             e.preventDefault();
             reset();
         })
-
-        // отправка формы
         document.forms["noteForm"].addEventListener("submit", e => {
             e.preventDefault();
             const form = document.forms["noteForm"];
             const id = form.elements["id"].value;
             const title = form.elements["title"].value;
             const description = form.elements["description"].value;
-            const userid = 1;
+            const username = document.getElementById("userName").innerText;
             if (id == 0)
-                CreateNote(title, description, userid);
+                CreateNote(title, description, username);
             else
-                EditNote(id, title, description, userid);
+                EditNote(id, title, description, username);
         });
 
-        // загрузка заметок
         GetNotes();
 
-        //Получение пользователей
         var tokenKey = "accessToken";
 
-        // отпавка запроса к контроллеру AccountController для получения токена
         async function getTokenAsync() {
-
-            // получаем данные формы и фомируем объект для отправки
             const formData = new FormData();
-            const emailLogin = "admin@gmail.com";
-            const passwordLogin = "12345";
             formData.append("grant_type", "password");
-            //formData.append("username", document.getElementById("emailLogin").value);
-            //formData.append("password", document.getElementById("passwordLogin").value);
-            formData.append("username", emailLogin);
-            formData.append("password", passwordLogin);
-
-            // отправляет запрос и получаем ответ
+            formData.append("username", document.getElementById("emailLogin").value);
+            formData.append("password", document.getElementById("passwordLogin").value);
             const response = await fetch("http://localhost:57476/token/", {
                 method: "POST",
                 headers: { "Accept": "application/json" },
                 body: formData
             });
-            // получаем данные
             const data = await response.json();
 
-            // если запрос прошел нормально
             if (response.ok === true) {
-
-                // изменяем содержимое и видимость блоков на странице
                 document.getElementById("userName").innerText = data.username;
                 document.getElementById("userInfo").style.display = "block";
                 document.getElementById("loginForm").style.display = "none";
-                // сохраняем в хранилище sessionStorage токен доступа
+                document.getElementById("submit").removeAttribute("disabled");
                 sessionStorage.setItem(tokenKey, data.access_token);
                 console.log(data.access_token);
             }
             else {
-                // если произошла ошибка, из errorText получаем текст ошибки
                 console.log("Error: ", response.status, data.errorText);
             }
         };
-        // отправка запроса к контроллеру ValuesController
         async function getData(url) {
             const token = sessionStorage.getItem(tokenKey);
 
@@ -302,7 +194,7 @@
                 method: "GET",
                 headers: {
                     "Accept": "application/json",
-                    "Authorization": "Bearer " + token  // передача токена в заголовке
+                    "Authorization": "Bearer " + token  
                 }
             });
             if (response.ok === true) {
@@ -313,15 +205,12 @@
             else
                 console.log("Status: ", response.status);
         };
-
-        // получаем токен
         document.getElementById("submitLogin").addEventListener("click", e => {
 
             e.preventDefault();
             getTokenAsync();
+            
         });
-
-        // условный выход - просто удаляем токен и меняем видимость блоков
         document.getElementById("logOut").addEventListener("click", e => {
 
             e.preventDefault();
@@ -329,21 +218,7 @@
             document.getElementById("userInfo").style.display = "none";
             document.getElementById("loginForm").style.display = "block";
             sessionStorage.removeItem(tokenKey);
-        });
-
-
-        // кнопка получения имя пользователя  - /api/values/getlogin
-        document.getElementById("getDataByLogin").addEventListener("click", e => {
-
-            e.preventDefault();
-            getData("http://localhost:57476/api/values/getlogin");
-        });
-
-        // кнопка получения роли  - /api/values/getrole
-        document.getElementById("getDataByRole").addEventListener("click", e => {
-
-            e.preventDefault();
-            getData("http://localhost:57476/api/values/getrole");
+            document.getElementById("submit").setAttribute('disabled', 'disabled');
         });
     </script>
 

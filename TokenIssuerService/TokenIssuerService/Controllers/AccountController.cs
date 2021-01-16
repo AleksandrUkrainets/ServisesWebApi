@@ -1,19 +1,15 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using TokenIssuerService.Models;
 
 namespace TokenIssuerService.Controllers
 {
-    //[Route("/token/[controller]")]
-    //[ApiController]
     [EnableCors]
     public class AccountController : Controller
     {
@@ -23,21 +19,7 @@ namespace TokenIssuerService.Controllers
         {
             _personContext = personContext;
         }
-
-        //// тестовые данные вместо использования базы данных
-        //private List<Person> people = new List<Person>
-        //{
-        //    new Person {Login="admin@gmail.com", Password="12345", Role = "admin" },
-        //    new Person { Login="qwerty@gmail.com", Password="55555", Role = "user" }
-        //};
-
-        //public async Task<ActionResult<IEnumerable<Person>>> Get()
-        //{
-        //    return await _personContext.Persones.ToListAsync();
-        //}
-
         [HttpPost("/token")]
-        //[HttpPost]
         public IActionResult Token(string username, string password)
         {
             var identity = GetIdentity(username, password);
@@ -47,7 +29,6 @@ namespace TokenIssuerService.Controllers
             }
 
             var now = DateTime.UtcNow;
-            // создаем JWT-токен
             var jwt = new JwtSecurityToken(
                     issuer: AuthOptions.ISSUER,
                     audience: AuthOptions.AUDIENCE,
@@ -82,7 +63,6 @@ namespace TokenIssuerService.Controllers
                 return claimsIdentity;
             }
 
-            // если пользователя не найдено
             return null;
         }
     }

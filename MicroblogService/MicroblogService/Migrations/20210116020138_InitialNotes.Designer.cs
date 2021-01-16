@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MicroblogService.Migrations
 {
     [DbContext(typeof(NotesContext))]
-    [Migration("20210115172704_InitialBlogDB")]
-    partial class InitialBlogDB
+    [Migration("20210116020138_InitialNotes")]
+    partial class InitialNotes
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -33,8 +33,8 @@ namespace MicroblogService.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -46,14 +46,14 @@ namespace MicroblogService.Migrations
                             Id = 1,
                             Description = "It is first test note in DB",
                             Title = "First test note",
-                            UserId = 1
+                            UserName = "qwerty@gmail.com"
                         },
                         new
                         {
                             Id = 2,
                             Description = "It is second test note in DB",
                             Title = "Second test note",
-                            UserId = 1
+                            UserName = "qwerty@gmail.com"
                         });
                 });
 #pragma warning restore 612, 618
