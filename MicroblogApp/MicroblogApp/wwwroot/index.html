@@ -198,17 +198,21 @@
                 });
                 linksTd.append(editLink);
 
-                const removeLink = document.createElement("a");
-                removeLink.setAttribute("data-id", note.id);
-                removeLink.setAttribute("style", "cursor:pointer;padding:15px;");
-                removeLink.append("Удалить");
-                removeLink.addEventListener("click", e => {
+                if (_userrole === "admin") {
+                    const removeLink = document.createElement("a");
+                    removeLink.setAttribute("data-id", note.id);
+                    removeLink.setAttribute("style", "cursor:pointer;padding:15px;");
+                    removeLink.append("Удалить");
+                    removeLink.addEventListener("click", e => {
 
-                    e.preventDefault();
-                    DeleteNote(note.id);
-                });
+                        e.preventDefault();
+                        DeleteNote(note.id);
+                    });
 
-                linksTd.append(removeLink);
+                    linksTd.append(removeLink);
+                }
+                    
+
                 tr.appendChild(linksTd);
             }
                 
