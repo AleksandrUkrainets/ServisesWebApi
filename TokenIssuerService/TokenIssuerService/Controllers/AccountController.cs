@@ -41,7 +41,8 @@ namespace TokenIssuerService.Controllers
             var response = new
             {
                 access_token = encodedJwt,
-                username = identity.Name
+                username = identity.Name,
+                userrole = identity.Claims.Last().Value
             };
 
             return Json(response);
