@@ -50,7 +50,7 @@ namespace TokenIssuerService.Controllers
 
         private ClaimsIdentity GetIdentity(string username, string password)
         {
-            Person person = _personContext.Persons.FirstOrDefault(x => x.Login == username && x.Password == password);
+            var person = GetPerson(username, password);
             if (person != null)
             {
                 var claims = new List<Claim>
@@ -65,6 +65,20 @@ namespace TokenIssuerService.Controllers
             }
 
             return null;
+        }
+        private Person GetPerson(string username, string password)
+        {
+            Person person = _personContext.Persons.FirstOrDefault(x => x.Login == username && x.Password == password);
+            return person;
+        }
+
+        [HttpPost("/create")]
+        public IActionResult Create(string username, string password)
+        {
+            Person person = new Person { Login = username, Password = password, Role = "user" };
+            _personContext.Add(person);
+            _personContext.SaveChanges();
+            return Json("Регистрация успешная!");
         }
     }
 }

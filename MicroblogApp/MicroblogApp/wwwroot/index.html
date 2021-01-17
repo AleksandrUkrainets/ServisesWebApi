@@ -69,14 +69,15 @@
                 <input type="email" id="emailLogin" /> <br />
                 <label>Введите пароль</label><br />
                 <input type="password" id="passwordLogin" /><br />
-                <input type="submit" id="submitLogin" value="Логин" />
+                <input type="submit" id="submitLogin" value="Войти" />
+                <input type="submit" id="submitRegister" value="Регистрация" />
             </div>
-            <div>
+            <!--<div>
                 <input type="submit" id="getDataByLogin" value="Данные по логину" />
             </div>
             <div>
                 <input type="submit" id="getDataByRole" value="Данные по роли" />
-            </div>
+            </div>-->
         </div>
     </div>
 
@@ -166,9 +167,9 @@
             }
         }
         function reset() {
-            const form = document.forms["noteForm"];
-            form.reset();
-            form.elements["id"].value = 0;
+            const noteForm = document.forms["noteForm"]; 
+            noteForm.reset();
+            noteForm.elements["id"].value = 0;
         }
 
         async function rewriteAll() {
@@ -272,6 +273,7 @@
                 document.getElementById("userInfo").style.display = "block";
                 document.getElementById("loginForm").style.display = "none";
                 document.getElementById("submit").removeAttribute("disabled");
+                document.getElementById("submitRegister").style.display = "none";
                 sessionStorage.setItem(tokenKey, data.access_token);
                 console.log(data.access_token);
                 rewriteAll();
@@ -304,6 +306,34 @@
             getTokenAsync();
             
         });
+
+        document.getElementById("submitRegister").addEventListener("click", e => {
+
+            e.preventDefault(); 
+            createUserAsync();
+
+        });
+
+        async function createUserAsync() {
+            const formData = new FormData();
+            formData.append("grant_type", "password");
+            formData.append("username", document.getElementById("emailLogin").value);
+            formData.append("password", document.getElementById("passwordLogin").value);
+            const response = await fetch("http://localhost:57476/create/", {
+                method: "POST",
+                headers: { "Accept": "application/json" },
+                body: formData
+            });
+            const data = await response.json();
+
+            if (response.ok === true) {
+                alert(data);
+            }
+            else {
+                console.log("Error: ", response.status, data.errorText);
+            }
+        };
+
         document.getElementById("logOut").addEventListener("click", e => {
 
             e.preventDefault();
@@ -312,42 +342,44 @@
             document.getElementById("loginForm").style.display = "block";
             sessionStorage.removeItem(tokenKey);
             document.getElementById("submit").setAttribute('disabled', 'disabled');
+            document.getElementById("submitRegister").style.display = "block";
             _userrole = "";
             rewriteAll();
+            reset();
         });
 
-        // отправка запроса к контроллеру 
-        async function getData(url) {
-            const token = sessionStorage.getItem(tokenKey);
+        //// отправка запроса к контроллеру 
+        //async function getData(url) {
+        //    const token = sessionStorage.getItem(tokenKey);
 
-            const response = await fetch(url, {
-                method: "GET",
-                headers: {
-                    "Accept": "application/json",
-                    "Authorization": "Bearer " + token  // передача токена в заголовке
-                }
-            });
-            if (response.ok === true) {
+        //    const response = await fetch(url, {
+        //        method: "GET",
+        //        headers: {
+        //            "Accept": "application/json",
+        //            "Authorization": "Bearer " + token  // передача токена в заголовке
+        //        }
+        //    });
+        //    if (response.ok === true) {
 
-                const data = await response.json();
-                alert(data)
-            }
-            else
-                console.log("Status: ", response.status);
-        };
-        // кнопка получения имя пользователя  - /api/values/getlogin
-        document.getElementById("getDataByLogin").addEventListener("click", e => {
+        //        const data = await response.json();
+        //        alert(data)
+        //    }
+        //    else
+        //        console.log("Status: ", response.status);
+        //};
+        //// кнопка получения имя пользователя  - /api/values/getlogin
+        //document.getElementById("getDataByLogin").addEventListener("click", e => {
 
-            e.preventDefault();
-            getData("http://localhost:62114/api/notes/getlogin");
-        });
+        //    e.preventDefault();
+        //    getData("http://localhost:62114/api/notes/getlogin");
+        //});
 
-        // кнопка получения роли  - /api/values/getrole
-        document.getElementById("getDataByRole").addEventListener("click", e => {
+        //// кнопка получения роли  - /api/values/getrole
+        //document.getElementById("getDataByRole").addEventListener("click", e => {
 
-            e.preventDefault();
-            getData("http://localhost:62114/api/notes/getrole");
-        });
+        //    e.preventDefault();
+        //    getData("http://localhost:62114/api/notes/getrole");
+        //});
     </script>
 
 </body>
