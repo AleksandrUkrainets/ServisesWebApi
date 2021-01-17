@@ -71,11 +71,20 @@
                 <input type="password" id="passwordLogin" /><br />
                 <input type="submit" id="submitLogin" value="Логин" />
             </div>
+            <div>
+                <input type="submit" id="getDataByLogin" value="Данные по логину" />
+            </div>
+            <div>
+                <input type="submit" id="getDataByRole" value="Данные по роли" />
+            </div>
         </div>
     </div>
 
     <script>
         var _userrole = "";
+        var tokenKey = "accessToken";
+        GetNotes();
+
         async function GetNotes() {
             const response = await fetch("http://localhost:62114/api/notes/", {
                 method: "GET",
@@ -89,6 +98,7 @@
                 });
             }
         }
+
         async function GetNote(id) {
             const response = await fetch("http://localhost:62114/api/notes/" + id, {
                 method: "GET",
@@ -102,6 +112,7 @@
                 form.elements["description"].value = note.description;
             }
         }
+
         async function CreateNote(noteTitle, noteDescription, userName) {
             const response = await fetch("http://localhost:62114/api/notes/", {
                 method: "POST",
@@ -119,11 +130,14 @@
             }
             reset();
         }
-        // Изменение заметки
+
         async function EditNote(noteId, noteTitle, noteDescription, userName) {
+            const token = sessionStorage.getItem(tokenKey);
             const response = await fetch("http://localhost:62114/api/notes/", {
                 method: "PUT",
-                headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                headers: {
+                    "Accept": "application/json", "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token },
                 body: JSON.stringify({
                     id: parseInt(noteId, 10),
                     title: noteTitle,
@@ -137,11 +151,14 @@
                 document.querySelector("tr[data-rowid='" + note.id + "']").replaceWith(row(note));
             }
         }
-        // Удаление заметки
+
         async function DeleteNote(id) {
+            const token = sessionStorage.getItem(tokenKey);
             const response = await fetch("http://localhost:62114/api/notes/" + id, {
                 method: "DELETE",
-                headers: { "Accept": "application/json" }
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + token }
             });
             if (response.ok === true) {
                 const note = await response.json();
@@ -167,6 +184,7 @@
                 });
             }
         }
+
         function row(note) {
 
             const tr = document.createElement("tr");
@@ -211,21 +229,17 @@
 
                     linksTd.append(removeLink);
                 }
-                    
-
                 tr.appendChild(linksTd);
             }
-                
-
-            
-
             return tr;
         }
+
         document.getElementById("reset").click(function (e) {
 
             e.preventDefault();
             reset();
         })
+
         document.forms["noteForm"].addEventListener("submit", e => {
             e.preventDefault();
             const form = document.forms["noteForm"];
@@ -238,10 +252,6 @@
             else
                 EditNote(id, title, description, username);
         });
-
-        GetNotes();
-
-        var tokenKey = "accessToken";
 
         async function getTokenAsync() {
             const formData = new FormData();
@@ -304,6 +314,39 @@
             document.getElementById("submit").setAttribute('disabled', 'disabled');
             _userrole = "";
             rewriteAll();
+        });
+
+        // отправка запроса к контроллеру 
+        async function getData(url) {
+            const token = sessionStorage.getItem(tokenKey);
+
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + token  // передача токена в заголовке
+                }
+            });
+            if (response.ok === true) {
+
+                const data = await response.json();
+                alert(data)
+            }
+            else
+                console.log("Status: ", response.status);
+        };
+        // кнопка получения имя пользователя  - /api/values/getlogin
+        document.getElementById("getDataByLogin").addEventListener("click", e => {
+
+            e.preventDefault();
+            getData("http://localhost:62114/api/notes/getlogin");
+        });
+
+        // кнопка получения роли  - /api/values/getrole
+        document.getElementById("getDataByRole").addEventListener("click", e => {
+
+            e.preventDefault();
+            getData("http://localhost:62114/api/notes/getrole");
         });
     </script>
 

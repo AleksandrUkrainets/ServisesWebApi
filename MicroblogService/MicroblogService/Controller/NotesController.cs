@@ -1,4 +1,5 @@
 ﻿using MicroblogService.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -68,7 +69,10 @@ namespace MicroblogService.Controller
             return Ok(note);
         }
 
+        
         [HttpDelete("{id}")]
+        //[Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<Note>> Delete(int id)
         {
             Note note = _db.Notes.FirstOrDefault(x => x.Id == id);
@@ -79,6 +83,21 @@ namespace MicroblogService.Controller
             _db.Notes.Remove(note);
             await _db.SaveChangesAsync();
             return Ok(note);
+        }
+
+        //*********
+        [Authorize]
+        [Route("getlogin")]
+        public IActionResult GetLogin()
+        {
+            return Ok($"Ваш логин: {User.Identity.Name}");
+        }
+
+        [Authorize(Roles = "admin")]
+        [Route("getrole")]
+        public IActionResult GetRole()
+        {
+            return Ok("Ваша роль: администратор");
         }
     }
 }
