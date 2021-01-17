@@ -39,6 +39,19 @@ namespace MicroblogService.Controller
             return new ObjectResult(note);
         }
 
+        //[HttpGet("{hash}")]
+        [Route("gethash{hash}")]
+        public async Task<ActionResult<IEnumerable<Note>>> GetHash(string hash)
+        {
+            var notes = await _db.Notes.Where(x => x.Title.Contains(hash)).ToListAsync();
+            //var selectedTeam = teams.Where(x => x.ToUpper().Contains('Б')).OrderBy(x => x);
+            if (notes == null)
+            {
+                return NotFound();
+            }
+            return (notes);
+        }
+
         [HttpPost]
         public async Task<ActionResult<Note>> Post(Note note)
         {
@@ -53,6 +66,7 @@ namespace MicroblogService.Controller
         }
 
         [HttpPut]
+        [Authorize(Roles = "admin,user")]
         public async Task<ActionResult<Note>> Put(Note note)
         {
             if (note == null)
@@ -71,7 +85,6 @@ namespace MicroblogService.Controller
 
         
         [HttpDelete("{id}")]
-        //[Authorize]
         [Authorize(Roles = "admin")]
         public async Task<ActionResult<Note>> Delete(int id)
         {
@@ -83,21 +96,6 @@ namespace MicroblogService.Controller
             _db.Notes.Remove(note);
             await _db.SaveChangesAsync();
             return Ok(note);
-        }
-
-        //*********
-        [Authorize]
-        [Route("getlogin")]
-        public IActionResult GetLogin()
-        {
-            return Ok($"Ваш логин: {User.Identity.Name}");
-        }
-
-        [Authorize(Roles = "admin")]
-        [Route("getrole")]
-        public IActionResult GetRole()
-        {
-            return Ok("Ваша роль: администратор");
         }
     }
 }
