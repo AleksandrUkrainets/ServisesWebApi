@@ -201,7 +201,6 @@
 
             if (_userrole === "admin" || _userrole === "user") {
                 const linksTd = document.createElement("td");
-
                 const editLink = document.createElement("a");
                 editLink.setAttribute("data-username", note.username);
                 editLink.setAttribute("style", "cursor:pointer;padding:15px;");
@@ -232,7 +231,6 @@
         }
 
         document.getElementById("reset").click(function (e) {
-
             e.preventDefault();
             reset();
         })
@@ -297,17 +295,13 @@
                 console.log("Status: ", response.status);
         };
         document.getElementById("submitLogin").addEventListener("click", e => {
-
             e.preventDefault();
             getTokenAsync();
-            
         });
 
         document.getElementById("submitRegister").addEventListener("click", e => {
-
             e.preventDefault(); 
             createUserAsync();
-
         });
 
         async function createUserAsync() {
@@ -331,7 +325,6 @@
         };
 
         document.getElementById("submit-hash").addEventListener("click", e => {
-
             e.preventDefault();
             const form = document.forms["noteForm"];
             var hash = form.elements["title"].value;
@@ -340,7 +333,6 @@
         });
 
         document.getElementById("all-notes").addEventListener("click", e => {
-
             e.preventDefault();
             for (var i = document.getElementById('tbl').getElementsByTagName('tr').length - 1; i; i--) {
                 document.getElementById('tbl').deleteRow(i);
@@ -367,7 +359,6 @@
         }
 
         document.getElementById("logOut").addEventListener("click", e => {
-
             e.preventDefault();
             document.getElementById("userName").innerText = "";
             document.getElementById("userInfo").style.display = "none";
@@ -379,40 +370,6 @@
             rewriteAll();
             reset();
         });
-
-        //// отправка запроса к контроллеру 
-        //async function getData(url) {
-        //    const token = sessionStorage.getItem(tokenKey);
-
-        //    const response = await fetch(url, {
-        //        method: "GET",
-        //        headers: {
-        //            "Accept": "application/json",
-        //            "Authorization": "Bearer " + token  // передача токена в заголовке
-        //        }
-        //    });
-        //    if (response.ok === true) {
-
-        //        const data = await response.json();
-        //        alert(data)
-        //    }
-        //    else
-        //        console.log("Status: ", response.status);
-        //};
-        //// кнопка получения имя пользователя  - /api/values/getlogin
-        //document.getElementById("getDataByLogin").addEventListener("click", e => {
-
-        //    e.preventDefault();
-        //    getData("http://localhost:62114/api/notes/getlogin");
-        //});
-
-        //// кнопка получения роли  - /api/values/getrole
-        //document.getElementById("getDataByRole").addEventListener("click", e => {
-
-        //    e.preventDefault();
-        //    getData("http://localhost:62114/api/notes/getrole");
-        //});
     </script>
-
 </body>
 </html>

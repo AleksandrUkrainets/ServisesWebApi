@@ -39,12 +39,10 @@ namespace MicroblogService.Controller
             return new ObjectResult(note);
         }
 
-        //[HttpGet("{hash}")]
         [Route("gethash{hash}")]
         public async Task<ActionResult<IEnumerable<Note>>> GetHash(string hash)
         {
             var notes = await _db.Notes.Where(x => x.Title.Contains(hash)).ToListAsync();
-            //var selectedTeam = teams.Where(x => x.ToUpper().Contains('Б')).OrderBy(x => x);
             if (notes == null)
             {
                 return NotFound();
