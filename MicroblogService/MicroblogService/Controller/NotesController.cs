@@ -1,4 +1,5 @@
 ﻿using MicroblogService.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +39,17 @@ namespace MicroblogService.Controller
             return new ObjectResult(note);
         }
 
+        [Route("gethash{hash}")]
+        public async Task<ActionResult<IEnumerable<Note>>> GetHash(string hash)
+        {
+            var notes = await _db.Notes.Where(x => x.Title.Contains(hash)).ToListAsync();
+            if (notes == null)
+            {
+                return NotFound();
+            }
+            return (notes);
+        }
+
         [HttpPost]
         public async Task<ActionResult<Note>> Post(Note note)
         {
@@ -52,6 +64,7 @@ namespace MicroblogService.Controller
         }
 
         [HttpPut]
+        [Authorize(Roles = "admin,user")]
         public async Task<ActionResult<Note>> Put(Note note)
         {
             if (note == null)
@@ -68,7 +81,9 @@ namespace MicroblogService.Controller
             return Ok(note);
         }
 
+        
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<Note>> Delete(int id)
         {
             Note note = _db.Notes.FirstOrDefault(x => x.Id == id);

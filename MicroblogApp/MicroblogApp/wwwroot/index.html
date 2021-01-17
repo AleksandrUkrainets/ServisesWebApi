@@ -38,8 +38,10 @@
                 <form name="noteForm">
                     <input type="hidden" name="id" value="0" />
                     <div class="form-group col-md-5">
-                        <label for="title">Заголовок:</label><br />
-                        <input class="form-control" name="title" size="100"/>
+                        <label for="title">#Тег:</label><br />
+                        <input class="form-control" name="title" size="100" />
+                        <button type="submit" id="submit-hash" class="btn btn-primary">Найти</button>
+                        <button type="submit" id="all-notes" class="btn btn-primary">Все заметки</button>
                     </div>
                     <div class="form-group col-md-5">
                         <label for="description">Заметка:</label><br />
@@ -50,8 +52,8 @@
                         <a id="reset" visibility: hidden class="btn btn-primary">Сбросить</a>
                     </div>
                 </form>
-                <table class="table table-condensed table-striped  col-md-6">
-                    <thead><tr><th>UserName</th><th>Заголовок</th><th>Заметки</th><th></th></tr></thead>
+                <table class="table table-condensed table-striped  col-md-6" cellpadding="10" id="tbl">
+                    <thead><tr><th>UserName</th><th>#Тег</th><th>Заметки</th><th></th></tr></thead>
                     <tbody>
                     </tbody>
                 </table>
@@ -60,6 +62,7 @@
         <div class="column right" style="background-color:#bbb;">
             <div id="userInfo" style="display:none;">
                 <p>Вы вошли как: <span id="userName"></span></p>
+                <p>Ваша роль: <span id="userRole"></span></p>
                 <input type="button" value="Выйти" id="logOut" />
             </div>
             <div id="loginForm">
@@ -68,12 +71,17 @@
                 <input type="email" id="emailLogin" /> <br />
                 <label>Введите пароль</label><br />
                 <input type="password" id="passwordLogin" /><br />
-                <input type="submit" id="submitLogin" value="Логин" />
+                <input type="submit" id="submitLogin" value="Войти" />
+                <input type="submit" id="submitRegister" value="Регистрация" />
             </div>
         </div>
     </div>
 
     <script>
+        var _userrole = "";
+        var tokenKey = "accessToken";
+        GetNotes();
+
         async function GetNotes() {
             const response = await fetch("http://localhost:62114/api/notes/", {
                 method: "GET",
@@ -87,6 +95,7 @@
                 });
             }
         }
+
         async function GetNote(id) {
             const response = await fetch("http://localhost:62114/api/notes/" + id, {
                 method: "GET",
@@ -100,6 +109,7 @@
                 form.elements["description"].value = note.description;
             }
         }
+
         async function CreateNote(noteTitle, noteDescription, userName) {
             const response = await fetch("http://localhost:62114/api/notes/", {
                 method: "POST",
@@ -117,11 +127,61 @@
             }
             reset();
         }
-        function reset() {
-            const form = document.forms["noteForm"];
-            form.reset();
-            form.elements["id"].value = 0;
+
+        async function EditNote(noteId, noteTitle, noteDescription, userName) {
+            const token = sessionStorage.getItem(tokenKey);
+            const response = await fetch("http://localhost:62114/api/notes/", {
+                method: "PUT",
+                headers: {
+                    "Accept": "application/json", "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token },
+                body: JSON.stringify({
+                    id: parseInt(noteId, 10),
+                    title: noteTitle,
+                    description: noteDescription,
+                    username: userName
+                })
+            });
+            if (response.ok === true) {
+                const note = await response.json();
+                reset();
+                document.querySelector("tr[data-rowid='" + note.id + "']").replaceWith(row(note));
+            }
         }
+
+        async function DeleteNote(id) {
+            const token = sessionStorage.getItem(tokenKey);
+            const response = await fetch("http://localhost:62114/api/notes/" + id, {
+                method: "DELETE",
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + token }
+            });
+            if (response.ok === true) {
+                const note = await response.json();
+                document.querySelector("tr[data-rowid='" + note.id + "']").remove();
+            }
+        }
+        function reset() {
+            const noteForm = document.forms["noteForm"]; 
+            noteForm.reset();
+            noteForm.elements["id"].value = 0;
+        }
+
+        async function rewriteAll() {
+            const response = await fetch("http://localhost:62114/api/notes/", {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                const notes = await response.json();
+                let rows = document.querySelector("tbody");
+                notes.forEach(note => {
+                    document.querySelector("tr[data-rowid='" + note.id + "']").replaceWith(row(note));
+                });
+            }
+        }
+
         function row(note) {
 
             const tr = document.createElement("tr");
@@ -139,13 +199,42 @@
             descriptionTd.append(note.description);
             tr.append(descriptionTd);
 
+            if (_userrole === "admin" || _userrole === "user") {
+                const linksTd = document.createElement("td");
+                const editLink = document.createElement("a");
+                editLink.setAttribute("data-username", note.username);
+                editLink.setAttribute("style", "cursor:pointer;padding:15px;");
+                editLink.append("Изменить");
+                editLink.addEventListener("click", e => {
+
+                    e.preventDefault();
+                    GetNote(note.id);
+                });
+                linksTd.append(editLink);
+
+                if (_userrole === "admin") {
+                    const removeLink = document.createElement("a");
+                    removeLink.setAttribute("data-id", note.id);
+                    removeLink.setAttribute("style", "cursor:pointer;padding:15px;");
+                    removeLink.append("Удалить");
+                    removeLink.addEventListener("click", e => {
+
+                        e.preventDefault();
+                        DeleteNote(note.id);
+                    });
+
+                    linksTd.append(removeLink);
+                }
+                tr.appendChild(linksTd);
+            }
             return tr;
         }
-        document.getElementById("reset").click(function (e) {
 
+        document.getElementById("reset").click(function (e) {
             e.preventDefault();
             reset();
         })
+
         document.forms["noteForm"].addEventListener("submit", e => {
             e.preventDefault();
             const form = document.forms["noteForm"];
@@ -158,10 +247,6 @@
             else
                 EditNote(id, title, description, username);
         });
-
-        GetNotes();
-
-        var tokenKey = "accessToken";
 
         async function getTokenAsync() {
             const formData = new FormData();
@@ -176,12 +261,16 @@
             const data = await response.json();
 
             if (response.ok === true) {
+                _userrole = data.userrole;
                 document.getElementById("userName").innerText = data.username;
+                document.getElementById("userRole").innerText = data.userrole;
                 document.getElementById("userInfo").style.display = "block";
                 document.getElementById("loginForm").style.display = "none";
                 document.getElementById("submit").removeAttribute("disabled");
+                document.getElementById("submitRegister").style.display = "none";
                 sessionStorage.setItem(tokenKey, data.access_token);
                 console.log(data.access_token);
+                rewriteAll();
             }
             else {
                 console.log("Error: ", response.status, data.errorText);
@@ -206,21 +295,81 @@
                 console.log("Status: ", response.status);
         };
         document.getElementById("submitLogin").addEventListener("click", e => {
-
             e.preventDefault();
             getTokenAsync();
-            
         });
-        document.getElementById("logOut").addEventListener("click", e => {
 
+        document.getElementById("submitRegister").addEventListener("click", e => {
+            e.preventDefault(); 
+            createUserAsync();
+        });
+
+        async function createUserAsync() {
+            const formData = new FormData();
+            formData.append("grant_type", "password");
+            formData.append("username", document.getElementById("emailLogin").value);
+            formData.append("password", document.getElementById("passwordLogin").value);
+            const response = await fetch("http://localhost:57476/create/", {
+                method: "POST",
+                headers: { "Accept": "application/json" },
+                body: formData
+            });
+            const data = await response.json();
+
+            if (response.ok === true) {
+                alert(data);
+            }
+            else {
+                console.log("Error: ", response.status, data.errorText);
+            }
+        };
+
+        document.getElementById("submit-hash").addEventListener("click", e => {
+            e.preventDefault();
+            const form = document.forms["noteForm"];
+            var hash = form.elements["title"].value;
+            GetNotesByHash(hash);
+
+        });
+
+        document.getElementById("all-notes").addEventListener("click", e => {
+            e.preventDefault();
+            for (var i = document.getElementById('tbl').getElementsByTagName('tr').length - 1; i; i--) {
+                document.getElementById('tbl').deleteRow(i);
+            }
+            reset();
+            GetNotes();
+        });
+
+        async function GetNotesByHash(hash) {
+            const response = await fetch("http://localhost:62114/api/notes/gethash" + hash, {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            for (var i = document.getElementById('tbl').getElementsByTagName('tr').length - 1; i; i--) {
+                document.getElementById('tbl').deleteRow(i);
+            }
+            if (response.ok === true) {
+                const notes = await response.json();
+                let rows = document.querySelector("tbody");
+                notes.forEach(note => {
+                    rows.append(row(note));
+                });
+            }
+        }
+
+        document.getElementById("logOut").addEventListener("click", e => {
             e.preventDefault();
             document.getElementById("userName").innerText = "";
             document.getElementById("userInfo").style.display = "none";
             document.getElementById("loginForm").style.display = "block";
             sessionStorage.removeItem(tokenKey);
             document.getElementById("submit").setAttribute('disabled', 'disabled');
+            document.getElementById("submitRegister").style.display = "block";
+            _userrole = "";
+            rewriteAll();
+            reset();
         });
     </script>
-
 </body>
 </html>
