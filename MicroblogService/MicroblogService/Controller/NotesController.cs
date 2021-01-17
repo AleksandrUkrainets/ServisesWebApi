@@ -51,6 +51,7 @@ namespace MicroblogService.Controller
         }
 
         [HttpPost]
+        [Authorize(Roles = "admin,user")]
         public async Task<ActionResult<Note>> Post(Note note)
         {
             if (note == null)
