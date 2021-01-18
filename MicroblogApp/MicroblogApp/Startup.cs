@@ -21,6 +21,7 @@ namespace MicroblogApp
             app.UseDefaultFiles();
             app.UseStaticFiles();
 
+            app.UseRouting();
         }
     }
 }

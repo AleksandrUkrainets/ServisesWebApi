@@ -5,9 +5,9 @@ VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MicroblogService", "MicroblogService\MicroblogService\MicroblogService.csproj", "{3959AA87-C56A-43AD-9678-87093F63CB47}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicroblogApp", "MicroblogApp\MicroblogApp\MicroblogApp.csproj", "{7D8D3835-110B-4C03-A033-1B72CDA2EB27}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MicroblogApp", "MicroblogApp\MicroblogApp\MicroblogApp.csproj", "{7D8D3835-110B-4C03-A033-1B72CDA2EB27}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TokenIssuerService", "TokenIssuerService\TokenIssuerService\TokenIssuerService.csproj", "{A0F40210-CBA0-4418-A9D3-5AD03D931EA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TokenIssuerService", "TokenIssuerService\TokenIssuerService\TokenIssuerService.csproj", "{A0F40210-CBA0-4418-A9D3-5AD03D931EA7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
