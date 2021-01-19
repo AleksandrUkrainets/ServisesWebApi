@@ -64,25 +64,13 @@
                     <hr>
                 </article><!-- /.blog-post -->
 
-                <article class="blog-post">
-                    <h2 class="blog-post-title">Another blog post</h2>
-                    <p class="blog-post-meta">December 23, 2013 by <a href="#">Jacob</a></p>
-                    <p>Cum sociis natoque penatibus et magnis <a href="#">dis parturient montes</a>, nascetur ridiculus mus. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.</p>
-                    <hr>
-                </article><!-- /.blog-post -->
-
-                <article class="blog-post">
-                    <h2 class="blog-post-title">New feature</h2>
-                    <p class="blog-post-meta">December 14, 2013 by <a href="#">Chris</a></p>
-                    <p>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aenean lacinia bibendum nulla sed consectetur. Etiam porta sem malesuada magna mollis euismod. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-                    <hr>
-                </article><!-- /.blog-post -->
-
                 <div class="blog-post" style="display: none;" id="templates">
                     <div id='post-template'>
                         <h2 class="blog-post-title" id='post-title'></h2>
                         <p class="blog-post-meta" id='post-meta'></p>
                         <p id='post-headline'></p>
+                        <a href="#" id="edit">Edit</a>
+                        <a href="#" id="delete">Delete</a>
                         <hr>
                     </div>
                 </div>
@@ -93,7 +81,12 @@
             </div>
 
             <div class="col-md-4">
-                <form>
+                <div id="userInfo" style="display:none;">
+                    <p>Вы вошли как: <span id="userName"></span></p>
+                    <p>Ваша роль: <span id="userRole"></span></p>
+                    <input type="button" value="Выйти" id="logOut" />
+                </div>
+                <form id="sign-it">
                     <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
                     <label for="inputEmail" class="visually-hidden">Email address</label>
                     <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
@@ -104,6 +97,16 @@
                     <button class="w-100 btn btn-lg btn-outline-secondary" type="button" id="register">Register</button>
                 </form>
                 <br>
+                <form id="new-post">
+                    <h1 class="h3 mb-3 fw-normal">New post or edit</h1>
+                    <input type="hidden" id="id" value="0" />
+                    <label for="inputTitle" class="visually-hidden">New title</label>
+                    <input class="form-control" id="inputTitle" placeholder="New title">
+                    <label for="inputPost" class="visually-hidden">New post</label>
+                    <textarea id="inputPost" class="form-control bg-body" placeholder="New post" rows="3"></textarea>
+                    <br>
+                    <button id="createPost" class="w-100 btn btn-lg btn-outline-success" type="submit">To post</button>
+                </form>
                 <div class="p-4 mb-3 bg-light rounded">
                     <h4 class="font-italic">About</h4>
                     <p class="mb-0">Etiam porta <em>sem malesuada magna</em> mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.</p>
@@ -137,6 +140,7 @@
         var _userrole = "";
         var tokenKey = "accessToken";
         GetNotes();
+        console.log("GetNotes ok");
 
         async function GetNotes() {
             const response = await fetch("http://localhost:62114/api/notes/", {
@@ -145,7 +149,7 @@
             });
             if (response.ok === true) {
                 const notes = await response.json();
-                for (let i = 0; i < notes.length; i++) {
+                for (let i = notes.length -1; i > 0 ; i--) {
                     rows(notes[i]);
                 }
             }
@@ -157,12 +161,186 @@
             let noteid = note.id;
             let headline = note.description;
             let title = note.title;
-            let postClone = $("#templates #post-template").clone().attr('id', 'id-' + noteid);
+            let postClone = $("#templates #post-template ").clone().attr('id', 'id-' + noteid);
             postClone.find("#post-title").text(title);
             postClone.find("#post-headline").text(headline);
             postClone.find("#post-meta").text(meta);
+            postClone.find("#edit").on({ "click": function () { GetNote(noteid) } }); /*.on("click", { "noteid": noteid }, GetNote())*/
+            postClone.find("#delete").on({ "click": function () { DeleteNote(noteid) } }); /*.on("click", { "noteid": noteid }, DeleteNote())*/
             posts.append(postClone);
         }
+
+        async function DeleteNote(id) {
+            const token = sessionStorage.getItem(tokenKey);
+            const response = await fetch("http://localhost:62114/api/notes/" + id, {
+                method: "DELETE",
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + token
+                }
+            });
+            if (response.ok === true) {
+                const note = await response.json();
+                $("div [id='id-" + note.id + "']").remove();
+            }
+        }
+
+        async function EditNote(noteId, noteTitle, noteDescription, userName) {
+            const token = sessionStorage.getItem(tokenKey);
+            const response = await fetch("http://localhost:62114/api/notes/", {
+                method: "PUT",
+                headers: {
+                    "Accept": "application/json", "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: JSON.stringify({
+                    id: parseInt(noteId, 10),
+                    title: noteTitle,
+                    description: noteDescription,
+                    username: userName
+                })
+            });
+            if (response.ok === true) {
+                const note = await response.json();
+                $("div [id='id-" + note.id + "']").replaceWith(rows(note));
+                reset();
+            }
+        }
+
+        async function GetNote(id) {
+            const response = await fetch("http://localhost:62114/api/notes/" + id, {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                const note = await response.json();
+                const form = document.forms["new-post"];
+                form.elements["id"].value = note.id;
+                form.elements["inputTitle"].value = note.title;
+                form.elements["inputPost"].value = note.description;
+            }
+        }
+
+
+        document.getElementById("createPost").addEventListener("click", e => {
+            e.preventDefault();
+            console.log("test ok");
+            const form = document.forms["new-post"];
+            var id = form.elements["id"].value;
+            const title = form.elements["inputTitle"].value;
+            const description = form.elements["inputPost"].value;
+            const username = document.getElementById("userName").innerText;
+            if (id == 0)
+                CreateNote(title, description, username);
+            else
+                EditNote(id, title, description, username);
+        });
+
+        async function CreateNote(noteTitle, noteDescription, userName) {
+            const token = sessionStorage.getItem(tokenKey);
+            const response = await fetch("http://localhost:62114/api/notes/", {
+                method: "POST",
+                headers: {
+                    "Accept": "application/json", "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: JSON.stringify({
+                    title: noteTitle,
+                    description: noteDescription,
+                    username: userName
+                })
+            });
+            if (response.ok === true) {
+                const note = await response.json();
+                rows(note);
+            }
+            reset();
+        }
+
+        function reset() {
+            const noteForm = document.forms["container"];
+            //noteForm.reset();
+            location.reload();
+
+            noteForm.elements["id"].value = 0;
+        }
+
+        async function getTokenAsync() {
+            const formData = new FormData();
+            formData.append("grant_type", "password");
+            formData.append("username", document.getElementById("inputEmail").value);
+            formData.append("password", document.getElementById("inputPassword").value);
+            const response = await fetch("http://localhost:57476/token/", {
+                method: "POST",
+                headers: { "Accept": "application/json" },
+                body: formData
+            });
+            const data = await response.json();
+
+            if (response.ok === true) {
+                _userrole = data.userrole;
+                document.getElementById("userName").innerText = data.username;
+                document.getElementById("userRole").innerText = data.userrole;
+                document.getElementById("userInfo").style.display = "block";
+                document.getElementById("sign-it").style.display = "none";
+                //document.getElementById("submit").removeAttribute("disabled");
+                //document.getElementById("submitRegister").style.display = "none";
+                sessionStorage.setItem(tokenKey, data.access_token);
+                console.log(data.access_token);
+                rewriteAll();
+            }
+            else {
+                console.log("Error: ", response.status, data.errorText);
+            }
+        };
+
+        async function getData(url) {
+            const token = sessionStorage.getItem(tokenKey);
+
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + token
+                }
+            });
+            if (response.ok === true) {
+
+                const data = await response.json();
+                alert(data)
+            }
+            else
+                console.log("Status: ", response.status);
+        };
+        document.getElementById("sign-it").addEventListener("click", e => {
+            e.preventDefault();
+            getTokenAsync();
+        });
+
+        document.getElementById("submitRegister").addEventListener("click", e => {
+            e.preventDefault();
+            createUserAsync();
+        });
+
+        async function createUserAsync() {
+            const formData = new FormData();
+            formData.append("grant_type", "password");
+            formData.append("username", document.getElementById("emailLogin").value);
+            formData.append("password", document.getElementById("passwordLogin").value);
+            const response = await fetch("http://localhost:57476/create/", {
+                method: "POST",
+                headers: { "Accept": "application/json" },
+                body: formData
+            });
+            const data = await response.json();
+
+            if (response.ok === true) {
+                alert(data);
+            }
+            else {
+                console.log("Error: ", response.status, data.errorText);
+            }
+        };
 
     </script>
 </body>
