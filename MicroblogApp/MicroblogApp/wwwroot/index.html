@@ -51,9 +51,7 @@
         <div class="p-4 p-md-5 mb-4 text-white rounded bg-dark" id="newtest-posts">
             <form id="newest-post">
                 <div class="col-md-12 px-0">
-                    <!--<h1 class="display-6 font-italic" id="newtest-title">Title of a longer featured blog post</h1>-->
                     <h1 class="newest-post-title display-6 font-italic" id="newest-title">t</h1>
-                    <!--<p class="lead my-3" id="newtest-meta">Multiple lines of text that form the lede, informing new readers quickly and efficiently about what’s most interesting in this post’s contents.</p>-->
                     <p class="newest-post-meta lead my-3" id="newest-meta">e</p>
                 </div>
             </form>
@@ -398,7 +396,7 @@
             const form = document.forms["Search"];
             var hash = form.elements["search-input"].value;
             GetNotesByHash(hash);
-
+            form.elements["search-input"].value = "";
         });
 
         async function GetNotesByHash(hash) {
