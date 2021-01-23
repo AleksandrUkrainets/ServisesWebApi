@@ -194,7 +194,7 @@
                     }, 100); } }); 
             postClone.find("#delete").on({ "click": function () { DeleteNote(noteid) } });
 
-            if (_userrole === "user") {
+            if (note.userName === document.getElementById("userName").innerText) {
                 postClone.find("#edit").attr('style', 'display:block;');
             }
 
