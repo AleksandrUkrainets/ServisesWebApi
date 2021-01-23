@@ -38,8 +38,8 @@
                     <a class="blog-header-logo text-dark" href="#">Microblog</a>
                 </div>
                 <div class="col-4 d-flex justify-content-end align-items-center">
-                    <form _lpchecked="1">
-                        <input class="form-control " type="text" placeholder="Search" aria-label="Search">
+                    <form _lpchecked="1" id="Search">
+                        <input class="form-control" id="search-input" type="text" placeholder="Search" aria-label="Search">
                     </form>
                 </div>
             </div>
@@ -48,11 +48,15 @@
     </div>
 
     <main class="container">
-        <div class="p-4 p-md-5 mb-4 text-white rounded bg-dark">
-            <div class="col-md-12 px-0">
-                <h1 class="display-6 font-italic">Title of a longer featured blog post</h1>
-                <p class="lead my-3">Multiple lines of text that form the lede, informing new readers quickly and efficiently about what’s most interesting in this post’s contents.</p>
-            </div>
+        <div class="p-4 p-md-5 mb-4 text-white rounded bg-dark" id="newtest-posts">
+            <form id="newest-post">
+                <div class="col-md-12 px-0">
+                    <!--<h1 class="display-6 font-italic" id="newtest-title">Title of a longer featured blog post</h1>-->
+                    <h1 class="newest-post-title display-6 font-italic" id="newest-title">t</h1>
+                    <!--<p class="lead my-3" id="newtest-meta">Multiple lines of text that form the lede, informing new readers quickly and efficiently about what’s most interesting in this post’s contents.</p>-->
+                    <p class="newest-post-meta lead my-3" id="newest-meta">e</p>
+                </div>
+            </form>
         </div>
 
         <div class="row">
@@ -62,15 +66,15 @@
                     <p class="blog-post-meta">January 1, 2014 by <a href="#">Mark</a></p>
                     <p>Cum sociis natoque penatibus et magnis <a href="#">dis parturient montes</a>, nascetur ridiculus mus. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.</p>
                     <hr>
-                </article><!-- /.blog-post -->
+                </article>
 
                 <div class="blog-post" style="display: none;" id="templates">
                     <div id='post-template'>
                         <h2 class="blog-post-title" id='post-title'></h2>
                         <p class="blog-post-meta" id='post-meta'></p>
                         <p id='post-headline'></p>
-                        <a href="#" id="edit">Edit</a>
-                        <a href="#" id="delete">Delete</a>
+                        <button type="button" id="edit" style="display:none;" class="btn btn-link">Edit</button>
+                        <button type="button" id="delete" style="display:none;" class="btn btn-link">Delete</button>
                         <hr>
                     </div>
                 </div>
@@ -82,9 +86,9 @@
 
             <div class="col-md-4">
                 <div id="userInfo" style="display:none;">
-                    <p>Вы вошли как: <span id="userName"></span></p>
-                    <p>Ваша роль: <span id="userRole"></span></p>
-                    <input type="button" value="Выйти" id="logOut" />
+                    <h3 class="h3 mb-3 fw-normal">You signed in : <span id="userRole"></span></h3>
+                    <h1 class="h1 mb-3 fw-normal"><span id="userName"></span></h1>
+                    <button class="w-100 btn btn-lg btn-outline-secondary" type="button" id="logOut" />Sing out</button>
                 </div>
                 <form id="sign-it">
                     <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
@@ -97,7 +101,7 @@
                     <button class="w-100 btn btn-lg btn-outline-secondary" type="button" id="register">Register</button>
                 </form>
                 <br>
-                <form id="new-post">
+                <form id="new-post" style="display:none;">
                     <h1 class="h3 mb-3 fw-normal">New post or edit</h1>
                     <input type="hidden" id="id" value="0" />
                     <label for="inputTitle" class="visually-hidden">New title</label>
@@ -106,7 +110,7 @@
                     <textarea id="inputPost" class="form-control bg-body" placeholder="New post" rows="3"></textarea>
                     <br>
                     <button id="createPost" class="w-100 btn btn-lg btn-outline-success" type="submit">To post</button>
-                </form>
+                </form><br/>
                 <div class="p-4 mb-3 bg-light rounded">
                     <h4 class="font-italic">About</h4>
                     <p class="mb-0">Etiam porta <em>sem malesuada magna</em> mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.</p>
@@ -140,6 +144,7 @@
         var _userrole = "";
         var tokenKey = "accessToken";
         GetNotes();
+        viewNewestPost();
         console.log("GetNotes ok");
 
         async function GetNotes() {
@@ -155,6 +160,20 @@
             }
         }
 
+        async function clearAll() {
+            const response = await fetch("http://localhost:62114/api/notes/", {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                const notes = await response.json();
+                for (let i = notes.length - 1; i > 0; i--) {
+                    $("div [id='id-" + notes[i].id + "']").remove();
+                }
+                
+            }
+        }
+
         function rows(note) {
             let posts = $("#posts");
             let meta = note.userName;
@@ -165,8 +184,22 @@
             postClone.find("#post-title").text(title);
             postClone.find("#post-headline").text(headline);
             postClone.find("#post-meta").text(meta);
-            postClone.find("#edit").on({ "click": function () { GetNote(noteid) } }); /*.on("click", { "noteid": noteid }, GetNote())*/
-            postClone.find("#delete").on({ "click": function () { DeleteNote(noteid) } }); /*.on("click", { "noteid": noteid }, DeleteNote())*/
+            postClone.find("#edit").on({
+                "click": function () {
+                    GetNote(noteid),
+                    setTimeout(function () {
+                        $("#inputTitle").focus();
+                    }, 100); } }); 
+            postClone.find("#delete").on({ "click": function () { DeleteNote(noteid) } });
+
+            if (_userrole === "user") {
+                postClone.find("#edit").attr('style', 'display:block;');
+            }
+
+            if (_userrole === "admin") {
+                postClone.find("#delete").attr('style', 'display:inline;');
+                postClone.find("#edit").attr('style', 'display:inline;');
+            }
             posts.append(postClone);
         }
 
@@ -230,6 +263,8 @@
             const title = form.elements["inputTitle"].value;
             const description = form.elements["inputPost"].value;
             const username = document.getElementById("userName").innerText;
+            
+            document.getElementById("inputPost").value = "";
             if (id == 0)
                 CreateNote(title, description, username);
             else
@@ -259,11 +294,23 @@
 
         function reset() {
             const noteForm = document.forms["container"];
-            //noteForm.reset();
-            location.reload();
-
+            clearAll();
+            GetNotes();
             noteForm.elements["id"].value = 0;
         }
+
+        async function viewNewestPost() {
+            const response = await fetch("http://localhost:62114/api/notes/getnewest", {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                const note = await response.json();
+                document.getElementById("newest-title").innerHTML = note.title;
+                document.getElementById("newest-meta").innerHTML = note.description;
+            }
+        }
+
 
         async function getTokenAsync() {
             const formData = new FormData();
@@ -283,11 +330,11 @@
                 document.getElementById("userRole").innerText = data.userrole;
                 document.getElementById("userInfo").style.display = "block";
                 document.getElementById("sign-it").style.display = "none";
-                //document.getElementById("submit").removeAttribute("disabled");
-                //document.getElementById("submitRegister").style.display = "none";
+                document.getElementById("new-post").style.display = "block";
                 sessionStorage.setItem(tokenKey, data.access_token);
                 console.log(data.access_token);
-                rewriteAll();
+                clearAll();
+                GetNotes();
             }
             else {
                 console.log("Error: ", response.status, data.errorText);
@@ -317,9 +364,23 @@
             getTokenAsync();
         });
 
-        document.getElementById("submitRegister").addEventListener("click", e => {
+        document.getElementById("register").addEventListener("click", e => {
             e.preventDefault();
             createUserAsync();
+        });
+
+        document.getElementById("logOut").addEventListener("click", e => {
+            e.preventDefault();
+            document.getElementById("userName").innerText = "";
+            document.getElementById("userInfo").style.display = "none";
+            document.getElementById("sign-it").style.display = "block";
+            sessionStorage.removeItem(tokenKey);
+            document.getElementById("new-post").style.display = "none";
+            document.getElementById("register").style.display = "block";
+            _userrole = "";
+            clearAll();
+            GetNotes();
+            reset();
         });
 
         async function createUserAsync() {
@@ -341,6 +402,30 @@
                 console.log("Error: ", response.status, data.errorText);
             }
         };
+
+        document.getElementById("Search").addEventListener("submit", e => {
+            e.preventDefault();
+            const form = document.forms["Search"];
+            var hash = form.elements["search-input"].value;
+            GetNotesByHash(hash);
+
+        });
+
+        async function GetNotesByHash(hash) {
+            clearAll();
+            const response = await fetch("http://localhost:62114/api/notes/gethash" + hash, {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            console.log("response: ", response.status);
+            if (response.ok === true) {
+                console.log("response ok: ", response.status);
+                const notes = await response.json();
+                for (let i = notes.length - 1; i >= 0; i--) {
+                    rows(notes[i]);
+                }
+            }
+        }
 
     </script>
 </body>
