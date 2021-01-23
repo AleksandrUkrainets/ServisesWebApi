@@ -51,7 +51,7 @@ namespace MicroblogService.Controller
         }
 
         [HttpPost]
-        //[Authorize(Roles = "admin,user")]
+        [Authorize(Roles = "admin,user")]
         public async Task<ActionResult<Note>> Post(Note note)
         {
             if (note == null)
@@ -65,7 +65,7 @@ namespace MicroblogService.Controller
         }
 
         [HttpPut]
-        //[Authorize(Roles = "admin,user")]
+        [Authorize(Roles = "admin,user")]
         public async Task<ActionResult<Note>> Put(Note note)
         {
             if (note == null)
@@ -84,7 +84,7 @@ namespace MicroblogService.Controller
 
         
         [HttpDelete("{id}")]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<Note>> Delete(int id)
         {
             Note note = _db.Notes.FirstOrDefault(x => x.Id == id);

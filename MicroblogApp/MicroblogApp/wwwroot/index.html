@@ -51,8 +51,8 @@
         <div class="p-4 p-md-5 mb-4 text-white rounded bg-dark" id="newtest-posts">
             <form id="newest-post">
                 <div class="col-md-12 px-0">
-                    <h1 class="newest-post-title display-6 font-italic" id="newest-title">t</h1>
-                    <p class="newest-post-meta lead my-3" id="newest-meta">e</p>
+                    <h1 class="newest-post-title display-6 font-italic" id="newest-title"></h1>
+                    <p class="newest-post-meta lead my-3" id="newest-meta"></p>
                 </div>
             </form>
         </div>
@@ -88,14 +88,14 @@
                     <h1 class="h1 mb-3 fw-normal"><span id="userName"></span></h1>
                     <button class="w-100 btn btn-lg btn-outline-secondary" type="button" id="logOut" />Sing out</button>
                 </div>
-                <form id="sign-it">
+                <form id="sign-it-form">
                     <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
                     <label for="inputEmail" class="visually-hidden">Email address</label>
                     <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
                     <label for="inputPassword" class="visually-hidden">Password</label>
                     <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
                     <br>
-                    <button class="w-100 btn btn-lg btn-outline-success" type="submit">Sign in</button>
+                    <button class="w-100 btn btn-lg btn-outline-success" type="submit" id="sign-it">Sign in</button>
                     <button class="w-100 btn btn-lg btn-outline-secondary" type="button" id="register">Register</button>
                 </form>
                 <br>
@@ -317,7 +317,7 @@
                 document.getElementById("userName").innerText = data.username;
                 document.getElementById("userRole").innerText = data.userrole;
                 document.getElementById("userInfo").style.display = "block";
-                document.getElementById("sign-it").style.display = "none";
+                document.getElementById("sign-it-form").style.display = "none";
                 document.getElementById("new-post").style.display = "block";
                 sessionStorage.setItem(tokenKey, data.access_token);
                 console.log(data.access_token);
@@ -361,7 +361,7 @@
             e.preventDefault();
             document.getElementById("userName").innerText = "";
             document.getElementById("userInfo").style.display = "none";
-            document.getElementById("sign-it").style.display = "block";
+            document.getElementById("sign-it-form").style.display = "block";
             sessionStorage.removeItem(tokenKey);
             document.getElementById("new-post").style.display = "none";
             document.getElementById("register").style.display = "block";
