@@ -50,17 +50,6 @@ namespace MicroblogService.Controller
             return (notes);
         }
 
-        [Route("getnewest")]
-        public async Task<ActionResult<Note>> GetNewest()
-        {
-            Note note = await _db.Notes.OrderBy(x => x.Id).LastOrDefaultAsync();
-            if (note == null)
-            {
-                return NotFound();
-            }
-            return new ObjectResult(note);
-        }
-
         [HttpPost]
         //[Authorize(Roles = "admin,user")]
         public async Task<ActionResult<Note>> Post(Note note)
@@ -103,7 +92,7 @@ namespace MicroblogService.Controller
             {
                 return NotFound();
             }
-            //_db.Notes.Remove(note);
+            _db.Notes.Remove(note);
             await _db.SaveChangesAsync();
             return Ok(note);
         }
