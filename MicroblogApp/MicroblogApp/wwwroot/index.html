@@ -70,7 +70,7 @@
                     <div id='post-template'>
                         <h2 class="blog-post-title" id='post-title'></h2>
                         <p class="blog-post-meta" id='post-meta'></p>
-                        <p id='post-headline'></p>
+                        <p id='post-headline' lead my-3></p>
                         <button type="button" id="edit" style="display:none;" class="btn btn-link">Edit</button>
                         <button type="button" id="delete" style="display:none;" class="btn btn-link">Delete</button>
                         <hr>
@@ -123,10 +123,8 @@
                     </ol>
                 </div>
             </div>
-
-        </div><!-- /.row -->
-
-    </main><!-- /.container -->
+        </div>
+    </main>
 
     <footer class="blog-footer">
         <p>Blog template built for <a href="https://getbootstrap.com/">Bootstrap</a> by <a href="https://twitter.com/mdo">@mdo</a>.</p>
@@ -374,8 +372,8 @@
         async function createUserAsync() {
             const formData = new FormData();
             formData.append("grant_type", "password");
-            formData.append("username", document.getElementById("emailLogin").value);
-            formData.append("password", document.getElementById("passwordLogin").value);
+            formData.append("username", document.getElementById("inputEmail").value);
+            formData.append("password", document.getElementById("inputPassword").value);
             const response = await fetch("http://localhost:57476/create/", {
                 method: "POST",
                 headers: { "Accept": "application/json" },
